@@ -85,7 +85,7 @@ for $n in $names {
             | save table.csv
         
         let filename = [$name, '.pdf'] | str join
-        typst compile main.typ $filename
+        typst compile letter.typ $filename
         rm table.csv variables.typ
     }
 }
