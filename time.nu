@@ -67,7 +67,8 @@ for $n in $names {
             | save --append variables.typ
 
         let wage = $stundenlohn | into string | str replace '.' ','
-        ['#let wage = "',$stundenlohn, '";'] 
+        
+        ['#let wage = "',$wage, '";'] 
             | str join
             | save --append variables.typ
 
