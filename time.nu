@@ -30,7 +30,10 @@ for $n in $names {
             | insert start { |row| $allClicksByName | where day == $row.day | get date | first | into datetime }
             | insert end { |row| $allClicksByName | where day == $row.day  | get date | last | into datetime }
             | insert duration { |row| ( $row.end | into int ) - ( $row.start | into int ) | into duration }
-            | insert pay { |row| (( $row.duration | into int ) / 3_600_000_000_000 ) * $stundenlohn | math round --precision 2 }
+            | insert pay { |row| (( $row.duration | into int ) / 3_600_000_000_000 ) * $stundenlohn 
+                                | math round --precision 2 
+                                | into string
+                                | str replace '.' ',' }
             | update day { |row| $row.start | format date "%d.%m.%Y" }
             | update start { || format date "%H:%M Uhr" }
             | update end { || format date "%H:%M Uhr" }
