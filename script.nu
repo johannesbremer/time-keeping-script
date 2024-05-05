@@ -53,13 +53,13 @@ for $namerow in $names {
             | str join
             | save --append variables.typ
 
-        let totalduration = $totalduration
+        let totaldurationstr = $totalduration
             | into string
             | str replace 'day' ' Tag,' 
             | str replace 'hr' ' Stunden,' 
             | str replace 'min' ' Minuten'
 
-        ['#let duration = "',$totalduration, '";'] 
+        ['#let duration = "',$totaldurationstr, '";'] 
             | str join
             | save --append variables.typ
 
