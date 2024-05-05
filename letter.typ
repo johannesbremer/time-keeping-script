@@ -17,10 +17,10 @@
   subject: "Lohnstundenabrechnung",
 )
 
-Frau #variables.name hat in dem angegeben 
-Zeitraum #variables.duration gearbeitet. 
+Frau *#variables.name* hat in dem angegeben 
+Zeitraum *#variables.duration* gearbeitet. 
 Der Stundenlohn beträgt #variables.wage\0€. 
-Mit der Lohnabrechnung werden #variables.pay überwiesen.
+Mit der Lohnabrechnung werden *#variables.pay* überwiesen.
 
 #let t = csv("table.csv")
 #table(
