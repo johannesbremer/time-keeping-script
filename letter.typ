@@ -16,7 +16,11 @@
   date: [#datetime.today().display("[day].[month].[year]")],
   subject: "Lohnstundenabrechnung",
 )
-Frau #variables.name hat in dem angegeben Zeitraum #variables.duration gearbeitet. Der Stundenlohn beträgt #variables.wage\0€. Mit der Lohnabrechnung werden #variables.pay überwiesen.
+
+Frau #variables.name hat in dem angegeben 
+Zeitraum #variables.duration gearbeitet. 
+Der Stundenlohn beträgt #variables.wage\0€. 
+Mit der Lohnabrechnung werden #variables.pay überwiesen.
 
 #let t = csv("table.csv")
 #table(
