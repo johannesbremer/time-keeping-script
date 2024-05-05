@@ -11,9 +11,9 @@ let input = open input.xlsx
 let namescsv = open names.csv
 let names = $namescsv | select username
 
-for $n in $names {
+for $namerow in $names {
 
-    let name = $n | values | first
+    let name = $namerow | values | first
 
     let allClicksByName = $input
         | where name == $name
