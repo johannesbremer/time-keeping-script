@@ -123,7 +123,7 @@ def table2pdf [date: datetime, inputlist: list] {
 
     let nextinputlist = $inputlist | where date > $cutoffdate
 
-    if ( $nextinputlist | is-empty) {} else {
+    if ( $nextinputlist | is-empty ) { return } else {
         splitupmonths $nextinputlist
     }
 }
