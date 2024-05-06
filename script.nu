@@ -9,7 +9,7 @@ let input = open input.xlsx
     | headers
     | rename user-id name place date device-id
     | select name date
-    | update date { |item| $item.date | into datetime }
+    | update date { || into datetime }
     | insert day { |row| $row.date | format date "%d" | into int }
 
 splitupmonths $input
