@@ -14,7 +14,7 @@ let input = open input.xlsx
 
 splitupmonths $input
 
-def splitupmonths [inputlist] {
+def splitupmonths [inputlist: list] {
     let firstdate = $inputlist | first
 
     if (( $firstdate | get day ) < $lohnabrechnungstag ) {
@@ -50,7 +50,6 @@ def table2pdf [date: datetime, inputlist: list] {
             | reject name
 
         if ( $allClicksByName | is-empty ) {} else {
-
             let days = $thismonth
                 | where name == $name
                 | uniq-by day
