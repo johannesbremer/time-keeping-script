@@ -1,25 +1,29 @@
-const stundenlohn = 12.5
-const lohnabrechnungstag = 16 # Stichtag z.B. immer der 16. im Monat.
+def main [
+    table: string # The table that to be used as your input. Must end with ".xlsx".
+    --day (-d) = 16 # The cut-off day for the monthly reports.
+    --names (-n) = "names.csv" # A .csv file for the username and the full name respectively. The corresponding file must have two columns and the first line must be "username,official-name".
+    --pay (-p) = 12.5 # The hourly wage to be used.
+] {    
+    let namescsv = $names | open
 
-let namescsv = open names.csv
-let names = $namescsv | select username
+    let input = $table
+        | open
+        | get Sheet
+        | headers
+        | rename user-id name place date device-id
+        | select name date
+        | update date { || into datetime }
+        | insert day { |row| $row.date | format date "%d" | into int }
 
-let input = open input.xlsx
-    | get Sheet
-    | headers
-    | rename user-id name place date device-id
-    | select name date
-    | update date { || into datetime }
-    | insert day { |row| $row.date | format date "%d" | into int }
+    splitupmonths $input $day $namescsv $pay
+}
 
-splitupmonths $input
-
-def splitupmonths [inputlist: list] {
+def splitupmonths [inputlist: list, day: int, namescsv: list, pay: float] {
     let firstdate = $inputlist | first
 
-    if (( $firstdate | get day ) < $lohnabrechnungstag ) {
+    if (( $firstdate | get day ) < $day ) {
         let date = $firstdate | get date
-        table2pdf $date $inputlist
+        table2pdf $date $inputlist $day $namescsv $pay
     } else {
         let dateint = $firstdate
             | get date
@@ -28,22 +32,25 @@ def splitupmonths [inputlist: list] {
         let nextmonth = $dateint + 2_628_000_000_000_000 # 2,628,000,000,000,000ns in an average month
             | into datetime
 
-        table2pdf $nextmonth $inputlist
+        table2pdf $nextmonth $inputlist $day $namescsv $pay
     }
 }
 
-def table2pdf [date: datetime, inputlist: list] {
+def table2pdf [date: datetime, inputlist: list, day: int, namescsv: list, pay: float] {
     let firstpart = $date
         | format date "%Y-%m-"
 
-    let cutoffdate = [$firstpart, $lohnabrechnungstag] 
+    let cutoffdate = [$firstpart, $day] 
         | str join
         | into datetime
 
     let thismonth = $inputlist
         | where date < $cutoffdate
 
-    for $namerow in $names {
+    
+    let usernames = $namescsv | select username
+
+    for $namerow in $usernames {
         let name = $namerow | values | first
         let allClicksByName = $thismonth
             | where name == $name
@@ -59,7 +66,7 @@ def table2pdf [date: datetime, inputlist: list] {
                 | insert start { |row| $allClicksByName | where day == $row.day | get date | first }
                 | insert end { |row| $allClicksByName | where day == $row.day  | get date | last }
                 | insert duration { |row| ( $row.end | into int ) - ( $row.start | into int ) | into duration }
-                | insert pay { |row| (( $row.duration | into int ) / 3_600_000_000_000 ) * $stundenlohn 
+                | insert pay { |row| (( $row.duration | into int ) / 3_600_000_000_000 ) * $pay 
                                     | math round --precision 2 
                                     | into string
                                     | str replace '.' ',' }
@@ -73,7 +80,7 @@ def table2pdf [date: datetime, inputlist: list] {
                 | get duration 
                 | math sum
 
-            let totalpay = (( $totalduration | into int ) / 3_600_000_000_000 ) * $stundenlohn # 3,600,000,000,000ns in a hour
+            let totalpay = (( $totalduration | into int ) / 3_600_000_000_000 ) * $pay # 3,600,000,000,000ns in a hour
                 | math round --precision 2 
                 | into string 
                 | str replace '.' ','
@@ -98,7 +105,7 @@ def table2pdf [date: datetime, inputlist: list] {
                 | str join
                 | save --append variables.typ
 
-            let wage = $stundenlohn | into string | str replace '.' ','
+            let wage = $pay | into string | str replace '.' ','
             
             ['#let wage = "',$wage, '";'] 
                 | str join
@@ -123,6 +130,6 @@ def table2pdf [date: datetime, inputlist: list] {
     let nextinputlist = $inputlist | where date > $cutoffdate
 
     if ( $nextinputlist | is-empty ) { return } else {
-        splitupmonths $nextinputlist
+        splitupmonths $nextinputlist $day $namescsv $pay
     }
 }
