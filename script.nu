@@ -1,7 +1,7 @@
 def main [
     table: string # The table that to be used as your input. Must end with ".xlsx".
     --day (-d) = 16 # The cut-off day for the monthly reports.
-    --names (-n) = "names.csv" # A .csv file for the username and the full name respectively. The corresponding file must have two columns and the first line must be "username,official-name".
+    --names (-n) = "names.csv" # A .csv file for the username and the full name respectively. The corresponding file must have two columns and the first line must be "username,full-name".
     --pay (-p) = 12.5 # The hourly wage to be used.
 ] {    
     let namescsv = $names | open
@@ -18,12 +18,12 @@ def main [
     splitupmonths $input $day $namescsv $pay
 }
 
-def splitupmonths [inputlist: list, day: int, namescsv: list, pay: float] {
-    let firstdate = $inputlist | first
+def splitupmonths [input: list, day: int, namescsv: list, pay: float] {
+    let firstdate = $input | first
 
     if (( $firstdate | get day ) < $day ) {
         let date = $firstdate | get date
-        table2pdf $date $inputlist $day $namescsv $pay
+        table2pdf $date $input $day $namescsv $pay
     } else {
         let dateint = $firstdate
             | get date
@@ -32,11 +32,11 @@ def splitupmonths [inputlist: list, day: int, namescsv: list, pay: float] {
         let nextmonth = $dateint + 2_628_000_000_000_000 # 2,628,000,000,000,000ns in an average month
             | into datetime
 
-        table2pdf $nextmonth $inputlist $day $namescsv $pay
+        table2pdf $nextmonth $input $day $namescsv $pay
     }
 }
 
-def table2pdf [date: datetime, inputlist: list, day: int, namescsv: list, pay: float] {
+def table2pdf [date: datetime, input: list, day: int, namescsv: list, pay: float] {
     let firstpart = $date
         | format date "%Y-%m-"
 
@@ -44,9 +44,8 @@ def table2pdf [date: datetime, inputlist: list, day: int, namescsv: list, pay: f
         | str join
         | into datetime
 
-    let thismonth = $inputlist
+    let thismonth = $input
         | where date < $cutoffdate
-
     
     let usernames = $namescsv | select username
 
@@ -81,12 +80,11 @@ def table2pdf [date: datetime, inputlist: list, day: int, namescsv: list, pay: f
                 | math sum
 
             let totalpay = (( $totalduration | into int ) / 3_600_000_000_000 ) * $pay # 3,600,000,000,000ns in a hour
-                | math round --precision 2 
-                | into string 
-                | str replace '.' ','
+                | math round --precision 2
 
             ['#let pay = "',$totalpay, '€";'] 
                 | str join
+                | str replace '.' ','
                 | save --append variables.typ
 
             let totaldurationstr = $totalduration
@@ -99,16 +97,15 @@ def table2pdf [date: datetime, inputlist: list, day: int, namescsv: list, pay: f
                 | str join
                 | save --append variables.typ
 
-            let fullname = $namescsv | where username == $name | get official-name | first
+            let fullname = $namescsv | where username == $name | get full-name | first
 
             ['#let name = "',$fullname, '";'] 
                 | str join
                 | save --append variables.typ
-
-            let wage = $pay | into string | str replace '.' ','
             
-            ['#let wage = "',$wage, '";'] 
+            ['#let wage = "',$pay, '";'] 
                 | str join
+                | str replace '.' ','
                 | save --append variables.typ
 
             $start2end
@@ -127,9 +124,9 @@ def table2pdf [date: datetime, inputlist: list, day: int, namescsv: list, pay: f
         }
     }
 
-    let nextinputlist = $inputlist | where date > $cutoffdate
+    let nextinput = $input | where date > $cutoffdate
 
-    if ( $nextinputlist | is-empty ) { return } else {
-        splitupmonths $nextinputlist $day $namescsv $pay
+    if ( $nextinput | is-empty ) { return } else {
+        splitupmonths $nextinput $day $namescsv $pay
     }
 }
