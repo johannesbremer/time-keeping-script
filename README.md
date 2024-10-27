@@ -4,15 +4,23 @@ Each PDF includes a table of all hours worked and totals for the month. The outp
 If you need support for other languages or have any questions, please open an issue.
 
 ```
-> nu script.nu --help
+❯ nu script.nu --help
 Usage:
-  > main {flags} <table>
+  > script.nu {flags} <table> 
+
 Flags:
-  -d, --day <Int> - The cut-off day for the monthly reports. (default: 16)
-  -n, --names <String> - A .csv file for the username and the full name respectively. The corresponding file must have two columns and the first line must be "username,full-name". (default: 'names.csv')
-  -p, --pay <Float> - The hourly wage to be used. (default: 12.5)
-  -h, --help - Display the help message for this command
+  -d, --day <int>: The cut-off day for the monthly reports. (default: 16)
+  -n, --names <string>: A .csv file for the username and the full name respectively. The corresponding file must have two columns and the first line must be "username,full-name". (default: 'names.csv')
+  -p, --pay <float>: The hourly wage to be used. (default: 12.5)
+  -h, --help: Display the help message for this command
 
 Parameters:
   table <string>: The table that to be used as your input. Must end with ".xlsx".
+
+Input/output types:
+  ╭───┬────────┬─────────╮
+  │ # │ input  │ output  │
+  ├───┼────────┼─────────┤
+  │ 0 │ string │ nothing │
+  ╰───┴────────┴─────────╯
 ```
