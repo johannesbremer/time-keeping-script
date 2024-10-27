@@ -3,7 +3,7 @@ def main [
     --day (-d) = 16 # The cut-off day for the monthly reports.
     --names (-n) = "names.csv" # A .csv file for the username and the full name respectively. The corresponding file must have two columns and the first line must be "username,full-name".
     --pay (-p) = 12.5 # The hourly wage to be used.
-]: nothing -> nothing  {    
+]: nothing -> nothing {    
     let namescsv = $names | open
 
     let input = $table
@@ -18,7 +18,7 @@ def main [
     splitupmonths $input $day $namescsv $pay
 }
 
-def splitupmonths [input: list, day: int, namescsv: list, pay: float] {
+def splitupmonths [input: list, day: int, namescsv: list, pay: float]: nothing -> nothing {
     let firstdate = $input | first
 
     if (( $firstdate | get day ) < $day ) {
@@ -36,7 +36,7 @@ def splitupmonths [input: list, day: int, namescsv: list, pay: float] {
     }
 }
 
-def table2pdf [date: datetime, input: list, day: int, namescsv: list, pay: float] {
+def table2pdf [date: datetime, input: list, day: int, namescsv: list, pay: float]: nothing -> nothing {
     let firstpart = $date
         | format date "%Y-%m-"
 
@@ -79,7 +79,7 @@ def table2pdf [date: datetime, input: list, day: int, namescsv: list, pay: float
                 | get duration 
                 | math sum
 
-            let totalpay = (( $totalduration | into int ) / 3_600_000_000_000 ) * $pay # 3,600,000,000,000ns in a hour
+            let totalpay = (( $totalduration | into int ) / 3_600_000_000_000 ) * $pay # 3,600,000,000,000ns in an hour
                 | math round --precision 2
 
             ['#let pay = "',$totalpay, '€";'] 
