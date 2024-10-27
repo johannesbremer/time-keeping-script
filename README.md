@@ -18,9 +18,9 @@ Parameters:
   table <string>: The table that to be used as your input. Must end with ".xlsx".
 
 Input/output types:
-  ╭───┬────────┬─────────╮
-  │ # │ input  │ output  │
-  ├───┼────────┼─────────┤
-  │ 0 │ string │ nothing │
-  ╰───┴────────┴─────────╯
+  ╭───┬─────────┬─────────╮
+  │ # │  input  │ output  │
+  ├───┼─────────┼─────────┤
+  │ 0 │ nothing │ nothing │
+  ╰───┴─────────┴─────────╯
 ```
