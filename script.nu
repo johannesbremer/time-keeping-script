@@ -4,7 +4,7 @@ def main [
     --names (-n) = "names.csv" # A .csv file for the username and the full name respectively. The corresponding file must have two columns and the first line must be "username,full-name".
     --pay (-p) = 12.5 # The hourly wage to be used.
 ]: nothing -> nothing {    
-    let namescsv = $names | open
+    let namescsv = open $names
 
     let input = $table
         | open
